@@ -23,8 +23,7 @@ async function start() {
 
   app.get("/", (req, res) => {
   res.json({
-    message: "Practice Task 11 API",
-    endpoints: ["/api/products"]
+    message: "Backend API is updated"
   });
 });
 
