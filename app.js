@@ -11,6 +11,20 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+function apiKeyAuth(req, res, next) {
+  const key = req.header("x-api-key");
+
+  if (!key) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (key !== process.env.API_KEY) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  next();
+}
+
 const client = new MongoClient(process.env.MONGO_URI);
 let productsCollection;
 
@@ -27,7 +41,7 @@ async function start() {
   });
 });
 
-app.post("/api/items", async (req, res) => {
+app.post("/api/items", apiKeyAuth, async (req, res) => {
   try {
     const { name, price, category } = req.body || {};
 
@@ -97,7 +111,7 @@ app.get("/api/items/:id", async (req, res) => {
   }
 });
 
-app.put("/api/items/:id", async (req, res) => {
+app.put("/api/items/:id", apiKeyAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price, category } = req.body || {};
@@ -132,7 +146,7 @@ app.put("/api/items/:id", async (req, res) => {
   }
 });
 
-app.patch("/api/items/:id", async (req, res) => {
+app.patch("/api/items/:id", apiKeyAuth, async (req, res) => {
   try {
   const { id } = req.params;
 
@@ -160,7 +174,7 @@ app.patch("/api/items/:id", async (req, res) => {
   }
 }); 
 
-app.delete("/api/items/:id", async (req, res) => {
+app.delete("/api/items/:id", apiKeyAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
